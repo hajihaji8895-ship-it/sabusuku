@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サブスク更新・解約管理メモ</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.25rem;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .summary-card, .form-card, .sub-card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .summary-card {
+      text-align: center;
+    }
+    .summary-price {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+    }
+    button.btn-add {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .sub-card.urgent {
+      border-left: 5px solid var(--danger);
+    }
+    .sub-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-right: 24px;
+    }
+    .sub-name {
+      font-weight: bold;
+      font-size: 1.05rem;
+    }
+    .sub-price {
+      font-weight: bold;
+    }
+    .days-left {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+    .days-danger { background: #fee2e2; color: var(--danger); }
+    .days-warning { background: #fef3c7; color: var(--warning); }
+    .days-normal { background: #e0f2fe; color: var(--primary); }
+    .sub-details {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 8px;
+    }
+    .btn-action-container {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-link {
+      display: inline-block;
+      background: #f1f5f9;
+      color: var(--primary);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.80rem;
+      font-weight: bold;
+    }
+    .edit-date-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.80rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .edit-date-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+    .btn-delete {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .disclaimer {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 24px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>サブスク更新・解約管理メモ（完全手動）</h1>
+
+  <!-- コスト集計 -->
+  <div class="summary-card">
+    <div>登録中の月額固定費 合計</div>
+    <div class="summary-price" id="totalMonthly">¥0 /月</div>
+    <div style="font-size:0.85rem; color:#64748b;" id="totalYearly">(年間 ¥0)</div>
+  </div>
+
+  <!-- 登録フォーム -->
+  <div class="form-card">
+    <div class="form-group">
+      <label>人気サービスから選択（または直接入力）</label>
+      <select id="presetSelect" onchange="applyPreset()">
+        <option value="">-- サービスを選択してください --</option>
+        <option value="Amazonプライム">Amazonプライム</option>
+        <option value="Netflix">Netflix</option>
+        <option value="YouTube Premium">YouTube Premium</option>
+        <option value="Apple Music">Apple Music</option>
+        <option value="Spotify">Spotify</option>
+        <option value="U-NEXT">U-NEXT</option>
+        <option value="custom">直接入力する</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>サービス名</label>
+      <input type="text" id="name" autocomplete="off" placeholder="例: Netflix">
+    </div>
+
+    <div class="form-group">
+      <label>月額料金 (円)</label>
+      <input type="number" id="price" autocomplete="off" placeholder="例: 1490">
+    </div>
+
+    <div class="form-group">
+      <label>入会日</label>
+      <input type="date" id="startDate" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label>次回更新日 / 無料体験終了日</label>
+      <input type="date" id="nextDate" autocomplete="off">
+    </div>
+
+    <button class="btn-add" onclick="addSubscription()">リストに追加する</button>
+  </div>
+
+  <!-- 一覧表示 -->
+  <div id="subList"></div>
+
+  <!-- 免責事項 -->
+  <div class="disclaimer">
+    ※完全手動管理です。自動で日付が変わることはありません。更新日が来たらご自身で日付を修正してください。
+  </div>
+</div>
+
+<script>
+  let subs = JSON.parse(localStorage.getItem('subscriptions_v8') || '[]');
+
+  function applyPreset() {
+    const select = document.getElementById('presetSelect');
+    const nameInput = document.getElementById('name');
+    const val = select.value;
+
+    if (!val || val === 'custom') {
+      if (val === 'custom') {
+        nameInput.value = '';
+        nameInput.focus();
+      }
+      return;
+    }
+    nameInput.value = val;
+  }
+
+  function saveAndRender() {
+    localStorage.setItem('subscriptions_v8', JSON.stringify(subs));
+    render();
+  }
+
+  function addSubscription() {
+    const nameInput = document.getElementById('name');
+    const priceInput = document.getElementById('price');
+    const startDateInput = document.getElementById('startDate');
+    const nextDateInput = document.getElementById('nextDate');
+
+    const name = nameInput.value.trim();
+    const price = Number(priceInput.value);
+    const startDate = startDateInput.value;
+    const nextDate = nextDateInput.value;
+
+    if (!name || !nextDate) {
+      alert('サービス名と次回更新日を入力してください。');
+      return;
+    }
+
+    subs.push({
+      id: Date.now(),
+      name: name,
+      price: price,
+      startDate: startDate,
+      nextDate: nextDate
+    });
+    
+    document.getElementById('presetSelect').value = '';
+    nameInput.value = '';
+    priceInput.value = '';
+    startDateInput.value = '';
+    nextDateInput.value = '';
+    
+    saveAndRender();
+  }
+
+  function deleteSub(id) {
+    if (confirm('削除してもよろしいですか？')) {
+      subs = subs.filter(item => item.id !== id);
+      saveAndRender();
+    }
+  }
+
+  function updateDateFromPicker(id, newDate) {
+    if (!newDate) return;
+    const item = subs.find(s => s.id === id);
+    if (item) {
+      item.nextDate = newDate;
+      saveAndRender();
+    }
+  }
+
+  function render() {
+    const listEl = document.getElementById('subList');
+    listEl.innerHTML = '';
+
+    let totalMonthly = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 日付順にソート
+    subs.sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate));
+
+    subs.forEach(item => {
+      totalMonthly += item.price || 0;
+
+      const parts = item.nextDate.split('-');
+      const targetDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      targetDate.setHours(0, 0, 0, 0);
+
+      const diffTime = targetDate.getTime() - today.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      let badgeClass = 'days-normal';
+      let badgeText = `更新まであと ${diffDays} 日`;
+      let isUrgent = false;
+
+      if (diffDays < 0) {
+        badgeClass = 'days-danger';
+        badgeText = `更新日が過ぎています（要日付変更）`;
+        isUrgent = true;
+      } else if (diffDays === 0) {
+        badgeClass = 'days-danger';
+        badgeText = `本日が更新日です！`;
+        isUrgent = true;
+      } else if (diffDays <= 3) {
+        badgeClass = 'days-danger';
+        badgeText = `解約期限直前！あと ${diffDays} 日`;
+        isUrgent = true;
+      } else if (diffDays <= 7) {
+        badgeClass = 'days-warning';
+        badgeText = `更新まであと ${diffDays} 日`;
+      }
+
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(item.name + ' 解約')}`;
+      const startText = item.startDate ? ` | 入会日: ${item.startDate}` : '';
+
+      const card = document.createElement('div');
+      card.className = `sub-card ${isUrgent ? 'urgent' : ''}`;
+      card.innerHTML = `
+        <button class="btn-delete" onclick="deleteSub(${item.id})">✕</button>
+        <div class="sub-header">
+          <span class="sub-name">${item.name}</span>
+          <span class="sub-price">¥${(item.price || 0).toLocaleString()}/月</span>
+        </div>
+        <div>
+          <span class="days-left ${badgeClass}">${badgeText}</span>
+        </div>
+        <div class="sub-details">
+          次回更新日: ${item.nextDate}${startText}
+        </div>
+        <div class="btn-action-container">
+          <a href="${searchUrl}" target="_blank" rel="noopener" class="btn-link">🔍 解約方法を検索</a>
+          <label class="edit-date-label">
+            📅 更新日を変更
+            <input type="date" class="edit-date-input" value="${item.nextDate}" onchange="updateDateFromPicker(${item.id}, this.value)" onclick="this.showPicker && this.showPicker()">
+          </label>
+        </div>
+      `;
+      listEl.appendChild(card);
+    });
+
+    document.getElementById('totalMonthly').textContent = `¥${totalMonthly.toLocaleString()} /月`;
+    document.getElementById('totalYearly').textContent = `(年間 ¥${(totalMonthly * 12).toLocaleString()})`;
+  }
+
+  render();
+</script>
+
+</body>
+</html>
