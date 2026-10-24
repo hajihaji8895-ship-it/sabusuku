@@ -31,7 +31,7 @@
       text-align: center;
       margin-bottom: 16px;
     }
-    .summary-card, .form-card, .sub-card {
+    .summary-card, .form-card, .sub-card, .ad-card, .nav-card {
       background: var(--card-bg);
       padding: 16px;
       border-radius: 12px;
@@ -161,6 +161,68 @@
       margin-top: 24px;
       line-height: 1.4;
     }
+    /* 広告枠スタイル */
+    .ad-card {
+      text-align: center;
+      padding: 12px;
+    }
+    .ad-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      text-align: right;
+    }
+    .ad-container-banner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .ad-container-banner img {
+      max-width: 100%;
+      height: auto;
+    }
+    .ad-container-text {
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+    .ad-container-text a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    /* 関連アプリリンク枠スタイル */
+    .nav-card {
+      padding: 16px;
+    }
+    .nav-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .nav-list li a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-block;
+      transition: color 0.2s;
+    }
+    .nav-list li a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -216,6 +278,39 @@
 
   <!-- 一覧表示 -->
   <div id="subList"></div>
+
+  <!-- 固定費見直し・節約おすすめ広告枠 -->
+  <div class="ad-card">
+    <div class="ad-label">スポンサーリンク</div>
+    
+    <!-- 1枠目：BIGLOBE WiMAX +5G（300x250バナー） -->
+    <div class="ad-container-banner">
+      <a href="https://px.a8.net/svt/ejp?a8mat=4BEFL0+4WTXMA+B4+2BSJOH" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www24.a8.net/svt/bgt?aid=261013860297&wid=009&eno=01&mid=s00000000040014074000&mc=1"></a>
+      <img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BEFL0+4WTXMA+B4+2BSJOH" alt="">
+    </div>
+
+    <!-- 2枠目：ワラウ（テキスト） -->
+    <div class="ad-container-text">
+      <a href="https://px.a8.net/svt/ejp?a8mat=4BEJHE+AQZY5U+3ZZC+HW2QA" rel="nofollow">登録無料☆ポイ活なら《ワラウ》</a>
+      <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BEJHE+AQZY5U+3ZZC+HW2QA" alt="">
+    </div>
+  </div>
+
+  <!-- 便利な関連ツール -->
+  <div class="nav-card">
+    <div class="nav-title">便利な関連ツール</div>
+    <ul class="nav-list">
+      <li><a href="https://0ff-7cn.pages.dev/" target="_blank" rel="noopener">👉 割引・セール計算機</a></li>
+      <li><a href="https://konetu.pages.dev/" target="_blank" rel="noopener">👉 光熱費管理</a></li>
+      <li><a href="https://shoumikigen.pages.dev/" target="_blank" rel="noopener">👉 賞味期限管理</a></li>
+      <li><a href="https://kaimono-4nt.pages.dev/" target="_blank" rel="noopener">👉 買い物リスト</a></li>
+      <li><a href="https://poinnto.pages.dev/" target="_blank" rel="noopener">👉 ポイ活管理</a></li>
+      <li><a href="https://souji-aap.pages.dev/" target="_blank" rel="noopener">👉 掃除管理</a></li>
+      <li><a href="https://running-29c.pages.dev/" target="_blank" rel="noopener">👉 ランニング記録</a></li>
+      <li><a href="https://gomidasi.pages.dev/" target="_blank" rel="noopener">👉 ゴミ出しスケジュール＆メモ</a></li>
+    </ul>
+  </div>
 
   <!-- 免責事項 -->
   <div class="disclaimer">
